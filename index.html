@@ -2,16 +2,40 @@
 <html>
 <head>
   <title>Cramly</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cramly">
 </head>
 <body>
-<h1>Cramly</h1>
-  <p>Paste your notes or a topic below.</p>
+  <div class="app-container">
+    <header>
+      <button id="themeToggle">🌙 Dark Mode</button>
+      <h1>🎓Cramly</h1>
+      <p class="tagline">Your friendly AI study buddy. Let's turn messy notes into an easy win.</p>
+    </header>
 
-  <textarea id="notesInput" rows="8" cols="50" placeholder="Paste your messy notes here..."></textarea>
-  <br><br>
-  <button id="generateBtn">Simplify & Quiz Me</button>
+    <textarea id="notesInput" rows="8" cols="50" placeholder="Paste your messy notes here..."></textarea>
+    <br><br>
 
-  <div id="output"></div>
+    <label for="imageInput">📷 Or attach a photo of your notes (optional):</label><br>
+    <input type="file" id="imageInput" accept="image/*">
+    <br><br>
+
+    <select id="difficulty">
+      <option value="easy">Easy (Quick Review)</option>
+      <option value="medium" selected>Medium (Standard)</option>
+      <option value="hard">Hard (Exam-Level, Written Answers)</option>
+    </select>
+    <br><br>
+
+    <button id="generateBtn">Start Studying</button>
+
+    <div id="output"></div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

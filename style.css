@@ -1,0 +1,134 @@
+:root {
+  --bg: #f4f4f4;
+  --text: #222;
+  --card-bg: #ffffff;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --question-bg: #fafafa;
+}
+
+body.dark {
+  --bg: #121212;
+  --text: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --question-bg: #262626;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.2s, color 0.2s;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.mascot {
+  font-size: 48px;
+  display: block;
+}
+
+h1 {
+  font-size: 44px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.tagline {
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 15px;
+}
+
+#themeToggle {
+  float: right;
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 15px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--accent-hover);
+}
+
+#output {
+  margin-top: 20px;
+  white-space: pre-wrap;
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.question-block {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: var(--question-bg);
+  border-radius: 6px;
+}
+
+#scoreDiv {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.correct {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+.incorrect {
+  color: #dc2626;
+  font-weight: bold;
+}
+#imageInput {
+  margin-bottom: 10px;
+}
+
+.answerInput {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  width: 100%;
+}
+
+body.dark .answerInput {
+  background: #2a2a2a;
+  color: #eee;
+  border-color: #444;
+}
