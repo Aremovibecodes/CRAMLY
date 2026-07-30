@@ -1,19 +1,5 @@
-:root {
-  --bg: #f4f4f4;
-  --text: #222;
-  --card-bg: #ffffff;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --question-bg: #fafafa;
-}
-
-body.dark {
-  --bg: #121212;
-  --text: #e0e0e0;
-  --card-bg: #1e1e1e;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --question-bg: #262626;
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -21,101 +7,126 @@ body {
   max-width: 700px;
   margin: 40px auto;
   padding: 0 20px;
-  background: var(--bg);
-  color: var(--text);
-  transition: background 0.2s, color 0.2s;
+  background: #f4f4f4;
+  color: #222;
+}
+
+.app-container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
 header {
   text-align: center;
-  margin-bottom: 20px;
-}
-
-.mascot {
-  font-size: 48px;
-  display: block;
+  margin-bottom: 30px;
+  position: relative;
+  padding-top: 45px;
 }
 
 h1 {
-  font-size: 44px;
-  color: var(--accent);
+  font-size: clamp(28px, 8vw, 44px);
+  color: #2563eb;
   margin-bottom: 4px;
 }
 
 .tagline {
-  color: var(--text);
-  opacity: 0.7;
+  color: #666;
   font-size: 15px;
 }
 
 #themeToggle {
-  float: right;
-  background: var(--card-bg);
-  color: var(--text);
-  border: 1px solid var(--accent);
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 20px;
   padding: 6px 14px;
-  border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
 }
 
-textarea {
+textarea, select, input[type="file"] {
   width: 100%;
   padding: 10px;
   font-size: 15px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  background: var(--card-bg);
-  color: var(--text);
+  font-family: inherit;
+}
+
+input[type="file"] {
+  padding: 8px;
+  background: #fafafa;
 }
 
 button {
   margin-top: 10px;
   padding: 10px 20px;
   font-size: 15px;
-  background: var(--accent);
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  width: 100%;
+  max-width: 250px;
 }
 
 button:hover {
-  background: var(--accent-hover);
+  background: #1d4ed8;
 }
 
 #output {
   margin-top: 20px;
-  white-space: pre-wrap;
-  background: var(--card-bg);
+  background: #fafafa;
   padding: 15px;
   border-radius: 6px;
-  line-height: 1.5;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+#output h2 {
+  font-size: 22px;
+  color: #2563eb;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 6px;
+}
+
+#output h2:first-child {
+  margin-top: 0;
+}
+
+#output h3 {
+  font-size: 17px;
+  color: #1d4ed8;
+  margin-top: 15px;
+  margin-bottom: 6px;
+}
+
+#output p {
+  margin: 6px 0 14px 0;
+}
+
+.cram-list {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.cram-list li {
+  margin-bottom: 8px;
 }
 
 .question-block {
   margin-bottom: 15px;
-  padding: 10px;
-  background: var(--question-bg);
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #eee;
   border-radius: 6px;
-}
-
-#scoreDiv {
-  margin-top: 15px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.correct {
-  color: #16a34a;
-  font-weight: bold;
-}
-
-.incorrect {
-  color: #dc2626;
-  font-weight: bold;
-}
-#imageInput {
-  margin-bottom: 10px;
 }
 
 .answerInput {
@@ -127,8 +138,101 @@ button:hover {
   width: 100%;
 }
 
+#scoreDiv {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.correct-answer {
+  color: green;
+  font-weight: bold;
+}
+
+.wrong-answer {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+.review-box {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f0f4ff;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.review-box p {
+  margin: 4px 0;
+}
+
+.error-message {
+  color: #c0392b;
+  background: #fdecea;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+body.dark {
+  background: #121212;
+  color: #eee;
+}
+
+body.dark .app-container {
+  background: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+body.dark .tagline {
+  color: #aaa;
+}
+
+body.dark textarea,
+body.dark select,
+body.dark input[type="file"],
 body.dark .answerInput {
   background: #2a2a2a;
   color: #eee;
   border-color: #444;
+}
+
+body.dark #output,
+body.dark .question-block {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+body.dark #output h2 {
+  border-bottom-color: #444;
+}
+
+body.dark .review-box {
+  background: #26314d;
+}
+
+body.dark .error-message {
+  background: #3a1f1f;
+  color: #ff8a80;
+}
+
+body.dark #themeToggle {
+  border-color: #555;
+  color: #eee;
+}
+
+@media (max-width: 480px) {
+  body {
+    margin: 15px auto;
+    padding: 0 10px;
+  }
+  .app-container {
+    padding: 18px;
+  }
+  header {
+    padding-top: 45px;
+  }
+  button {
+    max-width: 100%;
+  }
 }

@@ -3,6 +3,7 @@ if ("serviceWorker" in navigator) {
     console.log("Service worker registration failed:", err);
   });
 }
+
 const themeToggle = document.getElementById("themeToggle");
 const savedTheme = localStorage.getItem("cramlyTheme");
 
@@ -39,7 +40,12 @@ button.addEventListener("click", async function() {
   const imageFile = imageInput.files[0];
 
   if (notes === "" && !imageFile) {
-    output.innerHTML = "<p style='color:red;'>Please paste some notes or attach a photo before starting.</p>";
+    output.innerHTML = "<p class='error-message'>Please paste some notes or attach a photo before starting.</p>";
+    return;
+  }
+
+  if (imageFile && imageFile.size > 5 * 1024 * 1024) {
+    output.innerHTML = "<p class='error-message'>That image is a bit too large. Please use a photo under 5MB.</p>";
     return;
   }
 
@@ -57,17 +63,19 @@ button.addEventListener("click", async function() {
     const response = await fetch('/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        notes: notes,
-        difficulty: difficulty,
-        imageData: imageData,
-        imageMimeType: imageMimeType
-      })
+      body: JSON.stringify({ notes: notes, difficulty: difficulty, imageData: imageData, imageMimeType: imageMimeType })
     });
+
     const data = await response.json();
+
+    if (!response.ok) {
+      output.innerHTML = "<p class='error-message'>" + (data.error || "Something went wrong.") + "</p>";
+      return;
+    }
+
     renderResults(data);
   } catch (err) {
-    output.innerText = "Connection hiccup - check your internet and try again.";
+    output.innerHTML = "<p class='error-message'>Connection hiccup. Check your internet and try again.</p>";
   }
 });
 
@@ -76,7 +84,11 @@ function renderResults(data) {
   output.innerHTML = "";
 
   const explanationSection = document.createElement("div");
-  explanationSection.innerHTML = "<h2>Explanation</h2><p>" + data.explanation + "</p>";
+  let explanationHTML = "<h2>Explanation</h2>";
+  data.explanation.forEach(function(section) {
+    explanationHTML += "<h3>" + section.heading + "</h3><p>" + section.content + "</p>";
+  });
+  explanationSection.innerHTML = explanationHTML;
   output.appendChild(explanationSection);
 
   const quizDiv = document.createElement("div");
@@ -128,25 +140,40 @@ function renderResults(data) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ answers: answers })
         });
+
         const gradeData = await response.json();
+
+        if (!response.ok) {
+          scoreDiv.innerHTML = "<p class='error-message'>" + (gradeData.error || "Grading failed.") + "</p>";
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Submit Quiz";
+          return;
+        }
+
         const results = gradeData.results;
         let score = 0;
 
         results.forEach(function(result, index) {
           if (result.correct) score++;
           const block = questionBlocks[index];
-          block.querySelector(".answerInput").disabled = true;
+          const textarea = block.querySelector(".answerInput");
+          const studentAnswer = textarea.value.trim() || "(no answer given)";
+          textarea.disabled = true;
 
-          const feedback = document.createElement("p");
-          feedback.innerHTML = (result.correct ? "✅ " : "❌ ") + result.feedback;
-          feedback.className = result.correct ? "correct-answer" : "wrong-answer";
-          block.appendChild(feedback);
+          const review = document.createElement("div");
+          review.className = "review-box";
+          review.innerHTML =
+            "<p><strong>Your answer:</strong> " + studentAnswer + "</p>" +
+            "<p><strong>Model answer:</strong> " + data.quiz[index].modelAnswer + "</p>" +
+            "<p class='" + (result.correct ? "correct-answer" : "wrong-answer") + "'>" +
+            (result.correct ? "✅ Correct. " : "❌ Not quite. ") + result.feedback + "</p>";
+          block.appendChild(review);
         });
 
         scoreDiv.innerHTML = "<p><strong>You scored " + score + " out of " + results.length + "</strong></p>";
         submitBtn.style.display = "none";
       } catch (err) {
-        scoreDiv.innerHTML = "<p style='color:red;'>Grading failed. Check your connection and try again.</p>";
+        scoreDiv.innerHTML = "<p class='error-message'>Grading failed. Check your connection and try again.</p>";
         submitBtn.disabled = false;
         submitBtn.innerText = "Submit Quiz";
       }
@@ -158,6 +185,7 @@ function renderResults(data) {
         const block = questionBlocks[index];
         const selected = document.querySelector("input[name='q" + index + "']:checked");
         const selectedValue = selected ? parseInt(selected.value) : null;
+        const selectedText = selectedValue !== null ? q.options[selectedValue] : "(no answer selected)";
         if (selectedValue === q.correctIndex) score++;
 
         const labels = block.querySelectorAll("label");
@@ -172,13 +200,27 @@ function renderResults(data) {
           }
           input.disabled = true;
         });
+
+        const review = document.createElement("div");
+        review.className = "review-box";
+        review.innerHTML =
+          "<p><strong>Your answer:</strong> " + selectedText + "</p>" +
+          "<p><strong>Correct answer:</strong> " + q.options[q.correctIndex] + "</p>" +
+          "<p>" + q.explanation + "</p>";
+        block.appendChild(review);
       });
       scoreDiv.innerHTML = "<p><strong>You scored " + score + " out of " + data.quiz.length + "</strong></p>";
     });
   }
 
   output.appendChild(quizDiv);
+
   const cramSection = document.createElement("div");
-  cramSection.innerHTML = "<h2>Cram Sheet</h2><p>" + data.cramSheet + "</p>";
+  let cramHTML = "<h2>Cram Sheet</h2><ol class='cram-list'>";
+  data.cramSheet.forEach(function(point) {
+    cramHTML += "<li>" + point + "</li>";
+  });
+  cramHTML += "</ol>";
+  cramSection.innerHTML = cramHTML;
   output.appendChild(cramSection);
 }
