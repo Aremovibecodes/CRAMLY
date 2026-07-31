@@ -4,6 +4,13 @@ const express = require('express');
 require('dotenv').config();
 
 const app = express();
+const rateLimit = require('express-rate-limit');
+
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: "You're sending requests too quickly. Please wait a few minutes and try again." }
+});
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '10mb' }));
@@ -13,7 +20,7 @@ app.get('/test', (req, res) => {
   res.send('Server is alive!');
 });
 
-app.post('/generate', async (req, res) => {
+app.post('/generate', aiLimiter, async (req, res) => {
   const { notes, difficulty, imageData, imageMimeType } = req.body;
 
   if ((!notes || notes.trim() === '') && !imageData) {
@@ -32,9 +39,16 @@ app.post('/generate', async (req, res) => {
     ? "The student has attached a photo of handwritten or messy notes. Read it carefully first, then combine it with any typed notes below.\n\n"
     : "";
     const mathInstruction = "If the notes or image contain a worked example, solved equation, or math/formula problem, do not just restate the final answer. In the explanation, walk through WHY each step happens (the reasoning behind each move), not just what was done. In the quiz, test whether the student can apply the same method to a similar problem with different numbers, not just recall this exact answer. In the cram sheet, capture the general formula or technique pattern to remember, not the specific numbers from this one problem.\n\n";
-
+let difficultyInstruction = "";
+  if (difficulty === 'easy') {
+    difficultyInstruction = "Difficulty: EASY. Ask only direct, simple recall questions with the answer clearly and explicitly stated in the notes. No multi-step reasoning, no tricky wording. A student who skimmed the notes once should get these right.\n\n";
+  } else if (difficulty === 'hard') {
+    difficultyInstruction = "Difficulty: HARD. Make these genuinely tough, exam-level questions. Require multi-step reasoning, combining two or more concepts, or applying the idea to a new scenario not explicitly stated in the notes. For multiple choice, make wrong options very close and easy to confuse with the right one. This should feel like a real final exam question, not a review question. Still explain answers in simple words, but the QUESTION itself must be genuinely challenging.\n\n";
+  } else {
+    difficultyInstruction = "Difficulty: MEDIUM. Ask questions that require applying the concept to a slightly new example, not just repeating facts word for word, but not as tricky as an exam-level question.\n\n";
+  }
   const prompt = "You are a friendly study assistant helping a student cram for an exam. Many students using this are slow learners, so use very simple, everyday words, short sentences, and avoid jargon. If a technical term is necessary, explain it in plain words right after using it.\n\n" +
-    "Question difficulty level: " + difficulty + ". Adjust complexity: easy = recall-based, medium = application-based, hard = exam-level tricky reasoning, but ALWAYS keep the wording simple regardless of difficulty.\n\n" +
+    difficultyInstruction +
     imageInstruction +
     mathInstruction +
     "Respond with ONLY valid JSON, no markdown, no code fences, no extra text. Use exactly this structure:\n\n" +
@@ -92,7 +106,7 @@ if (!response.ok) {
   }
 });
 
-app.post('/grade', async (req, res) => {
+app.post('/grade', aiLimiter, async (req, res) => {
   const { answers } = req.body;
 
   if (!answers || answers.length === 0) {

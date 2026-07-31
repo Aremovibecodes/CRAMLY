@@ -236,3 +236,8 @@ body.dark #themeToggle {
     max-width: 100%;
   }
 }
+.missing-warning {
+  color: #c0392b;
+  font-weight: bold;
+  margin-top: 6px;
+}

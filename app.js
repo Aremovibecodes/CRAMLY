@@ -126,6 +126,26 @@ function renderResults(data) {
 
   if (isWritten) {
     submitBtn.addEventListener("click", async function() {
+      const oldWarnings = quizDiv.querySelectorAll(".missing-warning");
+      oldWarnings.forEach(function(w) { w.remove(); });
+
+      let firstUnanswered = null;
+      questionBlocks.forEach(function(block) {
+        const textarea = block.querySelector(".answerInput");
+        if (textarea.value.trim() === "") {
+          const warning = document.createElement("p");
+          warning.className = "missing-warning";
+          warning.innerText = "⚠️ Can't leave this blank";
+          block.appendChild(warning);
+          if (!firstUnanswered) firstUnanswered = block;
+        }
+      });
+
+      if (firstUnanswered) {
+        firstUnanswered.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
       submitBtn.disabled = true;
       submitBtn.innerText = "Grading...";
 
@@ -180,6 +200,27 @@ function renderResults(data) {
     });
   } else {
     submitBtn.addEventListener("click", function() {
+      const oldWarnings = quizDiv.querySelectorAll(".missing-warning");
+      oldWarnings.forEach(function(w) { w.remove(); });
+
+      let firstUnanswered = null;
+      data.quiz.forEach(function(q, index) {
+        const selected = document.querySelector("input[name='q" + index + "']:checked");
+        if (!selected) {
+          const block = questionBlocks[index];
+          const warning = document.createElement("p");
+          warning.className = "missing-warning";
+          warning.innerText = "⚠️ You missed this";
+          block.appendChild(warning);
+          if (!firstUnanswered) firstUnanswered = block;
+        }
+      });
+
+      if (firstUnanswered) {
+        firstUnanswered.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
       let score = 0;
       data.quiz.forEach(function(q, index) {
         const block = questionBlocks[index];
