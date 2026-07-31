@@ -31,10 +31,12 @@ app.post('/generate', async (req, res) => {
   const imageInstruction = imageData
     ? "The student has attached a photo of handwritten or messy notes. Read it carefully first, then combine it with any typed notes below.\n\n"
     : "";
+    const mathInstruction = "If the notes or image contain a worked example, solved equation, or math/formula problem, do not just restate the final answer. In the explanation, walk through WHY each step happens (the reasoning behind each move), not just what was done. In the quiz, test whether the student can apply the same method to a similar problem with different numbers, not just recall this exact answer. In the cram sheet, capture the general formula or technique pattern to remember, not the specific numbers from this one problem.\n\n";
 
   const prompt = "You are a friendly study assistant helping a student cram for an exam. Many students using this are slow learners, so use very simple, everyday words, short sentences, and avoid jargon. If a technical term is necessary, explain it in plain words right after using it.\n\n" +
     "Question difficulty level: " + difficulty + ". Adjust complexity: easy = recall-based, medium = application-based, hard = exam-level tricky reasoning, but ALWAYS keep the wording simple regardless of difficulty.\n\n" +
     imageInstruction +
+    mathInstruction +
     "Respond with ONLY valid JSON, no markdown, no code fences, no extra text. Use exactly this structure:\n\n" +
     "{\n  \"explanation\": [ { \"heading\": \"short section title\", \"content\": \"plain language explanation\" } ],\n  \"quiz\": [ ... ],\n  \"cramSheet\": [ \"point 1\", \"point 2\" ]\n}\n\n" +
     "EXPLANATION: Break the material into 2 to 5 short sections, each with its own clear heading, teaching it from scratch like a patient tutor.\n\n" +
@@ -59,11 +61,11 @@ app.post('/generate', async (req, res) => {
         body: JSON.stringify({ contents: [{ parts: parts }] })
       }
     );
-
-    if (!response.ok) {
-      console.error('Gemini API error status:', response.status);
-      return res.status(502).json({ error: 'The AI service did not respond correctly. Please try again.' });
-    }
+if (!response.ok) {
+  const errorBody = await response.text();
+  console.error('Gemini API error status:', response.status, 'Body:', errorBody);
+  return res.status(502).json({ error: 'The AI service did not respond correctly. Please try again.' });
+}
 
     const data = await response.json();
 
